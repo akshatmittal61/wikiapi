@@ -33,34 +33,35 @@ const articleSchema = new mongoose.Schema({
 });
 const Article = new mongoose.model("Article", articleSchema);
 
-app.get("/articles", (req, res) => {
-	Article.find({}, (err, data) => {
-		if (err) res.send(err);
-		else res.send(data);
+app.route("/articles")
+	.get((req, res) => {
+		Article.find({}, (err, data) => {
+			if (err) res.send(err);
+			else res.send(data);
+		});
+	})
+	.post((req, res) => {
+		const newArticle = new Article(req.body);
+		newArticle.save((err) => {
+			if (err) res.send(err);
+			else
+				res.send({
+					status: 200,
+					message: "Successfully added new article",
+					data: newArticle,
+				});
+		});
+	})
+	.delete((req, res) => {
+		Article.deleteMany({}, (err) => {
+			if (err) res.send(err);
+			else
+				res.send({
+					status: 200,
+					message: "Successfully deleted all articles",
+				});
+		});
 	});
-});
-app.post("/articles", (req, res) => {
-	const newArticle = new Article(req.body);
-	newArticle.save((err) => {
-		if (err) res.send(err);
-		else
-			res.send({
-				status: 200,
-				message: "Successfully added new article",
-				data: newArticle,
-			});
-	});
-});
-app.delete("/articles", (req, res) => {
-	Article.deleteMany({}, (err) => {
-		if (err) res.send(err);
-		else
-			res.send({
-				status: 200,
-				message: "Successfully deleted all articles",
-			});
-	});
-});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`server started at port ${PORT}`));

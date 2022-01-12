@@ -10,10 +10,7 @@ const app = express();
 mongoose.connect(process.env.MONGO_CONNECTION_STRING, (err) => {
 	if (err) console.log(err);
 	else
-		console.log(
-			"Conencted to mongodb server at " +
-				process.env.MONGO_CONNECTION_STRING
-		);
+		console.log(`Conencted to mongodb server at ${process.env.MONGO_CONNECTION_STRING}`);
 });
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -61,6 +58,39 @@ app.route("/articles")
 					message: "Successfully deleted all articles",
 				});
 		});
+	});
+app.route("/articles/:title")
+	.get((req, res) => {
+		const title = req.params.title;
+		Article.findOne({ title: title }, (err, data) => {
+			if (err) res.send(err);
+			else {
+				if (data) res.send(data);
+				else
+					res.send({
+						status: 400,
+						message: `No article with the title ${title}`,
+					});
+			}
+		});
+	})
+	.put((req, res) => {
+		const title = req.params.title;
+		const newArticle = req.body;
+		console.log(newArticle);
+		Article.updateOne(
+			{ title: title },
+			newArticle,
+			{ owerwrite: true },
+			(err) => {
+				if (err) res.send(err);
+				else
+					res.send({
+						status: 200,
+						message: "Successfully updated",
+					});
+			}
+		);
 	});
 
 const PORT = process.env.PORT || 5000;

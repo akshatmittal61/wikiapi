@@ -77,11 +77,9 @@ app.route("/articles/:title")
 	.put((req, res) => {
 		const title = req.params.title;
 		const newArticle = req.body;
-		console.log(newArticle);
 		Article.updateOne(
 			{ title: title },
 			newArticle,
-			{ owerwrite: true },
 			(err) => {
 				if (err) res.send(err);
 				else
@@ -89,6 +87,35 @@ app.route("/articles/:title")
 						status: 200,
 						message: "Successfully updated",
 					});
+			}
+		);
+	})
+	.patch((req, res) => {
+		const title = req.params.title;
+		let newArticle = req.body;
+		Article.updateOne(
+			{ title: title },
+			{ $set: newArticle },
+			(err) => {
+				if (err) res.send(err);
+				else
+					res.send({
+						status: 200,
+						message: "Successfully updated",
+					});
+			}
+		);
+	})
+	.delete((req, res) => {
+		const title = req.params.title;
+		Article.deleteOne(
+			{ title: title },
+			(err) => {
+				if (err) res.send(err)
+				else res.send({
+					status: 200,
+					message: "Successfully deleted article",
+				})
 			}
 		);
 	});
